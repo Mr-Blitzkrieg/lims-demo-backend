@@ -57,9 +57,40 @@ class ExpiringToken(Token):
             self.expiration = timezone.now() + timezone.timedelta(minutes=TIME_FOR_EXPIRATION_IN_MINUTES)
         return super(ExpiringToken, self).save(*args, **kwargs)
     
+class LabUser(BaseModel):
+    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE)
+    name = models.CharField(max_length=150)
+    department = models.CharField(max_length=100)
+    address = models.CharField(max_length=120)
+    city = models.CharField(max_length=70)
+    state = models.CharField(max_length=50)
+    pincode = models.IntegerField()
+    contry = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
 
 
-    
+class PatientUser(BaseModel):
+
+    GENDER_CHOICES = [('male','Male'),
+                      ('female','Female'),
+                      ('others','Others')]
+
+    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE)
+    name = models.CharField(max_length=150)
+    date_of_birth = models.DateField(null=True)
+    gender = models.CharField(max_length=12,choices=GENDER_CHOICES)
+    height = models.IntegerField(null=True,default=0)
+    weight = models.IntegerField(null=True,default=0)
+    address = models.CharField(max_length=120,null=True,blank=True)
+    city = models.CharField(max_length=70,null=True,blank=True)
+    state = models.CharField(max_length=50,null=True,blank=True)
+    pincode = models.CharField(max_length=10,null=True,blank=True)
+    contry = models.CharField(max_length=50,null=True,blank=True)
+
+    def __str__(self):
+        return self.name
 
 
     
