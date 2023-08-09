@@ -1,6 +1,10 @@
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager,PermissionsMixin
 from django.db import models
 from commons.models import BaseModel
+from django.utils import timezone
+from rest_framework.authtoken.models import Token
+
+TIME_FOR_EXPIRATION_IN_MINUTES = 30
 
 class CustomAccountManager(BaseUserManager):
 
@@ -44,6 +48,17 @@ class CustomUser(AbstractBaseUser,PermissionsMixin,BaseModel):
 
     def __str__(self):
         return str(self.email)
+    
+class ExpiringToken(Token):
+    expiration = models.DateTimeField()
+
+    def save(self, *args, **kwargs):
+        if not self.expiration:
+            self.expiration = timezone.now() + timezone.timedelta(minutes=TIME_FOR_EXPIRATION_IN_MINUTES)
+        return super(ExpiringToken, self).save(*args, **kwargs)
+    
+
+
     
 
 
