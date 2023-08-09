@@ -134,8 +134,12 @@ MEDIA_ROOT = os.path.join(REPOSITORY_ROOT,"media/")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#CORS SETTING
+# CORS SETTING
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_ALL_ORIGINS = [
     #frontend URL
 ]
+
+# Auth user model config
+
+AUTH_USER_MODEL = "accounts.CustomUser"
