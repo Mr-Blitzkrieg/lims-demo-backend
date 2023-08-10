@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     #Additional Apps
     'accounts',
     'rest_framework',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+    'bill_app'
 ]
 
 MIDDLEWARE = [
