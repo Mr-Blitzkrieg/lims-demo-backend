@@ -28,3 +28,6 @@ def create_patientuser(*args,**kwargs) -> PatientUser:
 
 def filter_patientuser(*args,**kwargs) -> QuerySet:
     return PatientUser.objects.filter(*args,**kwargs)
+
+def get_patientuser(*args,**kwargs) -> PatientUser:
+    return PatientUser.objects.get(*args,**kwargs)
