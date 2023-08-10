@@ -148,7 +148,7 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'accounts.auth_class.ExpiringTokenAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'accounts.auth_class.ExpiringTokenAuthentication',

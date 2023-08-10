@@ -65,7 +65,7 @@ class LabUser(BaseModel):
     city = models.CharField(max_length=70)
     state = models.CharField(max_length=50)
     pincode = models.IntegerField()
-    contry = models.CharField(max_length=50)
+    country = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
@@ -87,7 +87,7 @@ class PatientUser(BaseModel):
     city = models.CharField(max_length=70,null=True,blank=True)
     state = models.CharField(max_length=50,null=True,blank=True)
     pincode = models.CharField(max_length=10,null=True,blank=True)
-    contry = models.CharField(max_length=50,null=True,blank=True)
+    country = models.CharField(max_length=50,null=True,blank=True)
 
     def __str__(self):
         return self.name

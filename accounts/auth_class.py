@@ -11,6 +11,7 @@ class ExpiringTokenAuthentication(TokenAuthentication):
             raise AuthenticationFailed('Invalid token')
 
         if token.expiration < timezone.now():
+            token.delete()
             raise AuthenticationFailed('Token has expired')
-
-        return self.authenticate_user(token.user)
+        
+        return (token.user, token.key)
