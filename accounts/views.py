@@ -91,14 +91,13 @@ class LabUserView(BaseView):
             "country": request.data.get("country")
         }
 
-        resp = {"message": "Lab User created successfully","token": ""}
-
         labuser_instance = create_labuser(**lab_user_data)
-        if labuser_instance:
-            token,_ = get_or_create_token(user=labuser_instance.user)
-            resp.update({"token":token.key})
 
-        return api_success_response(response_data=resp,status=status.HTTP_201_CREATED)
+        if not labuser_instance:
+            return api_error_response(error_data={"error":"Lab User creation failed"})
+        
+        token,_ = get_or_create_token(user=labuser_instance.user)
+        return api_success_response(response_data={"message": "Lab User created successfully","token": token.key},status=status.HTTP_201_CREATED)
     
 
     
@@ -152,14 +151,13 @@ class PatientUserView(BaseView):
             "country": request.data.get("country")
         }
 
-        resp = {"message": "Patient User created successfully","token": ""}
-
         patientuser_instance = create_patientuser(**patient_user_data)
-        if patientuser_instance:
-            token,_ = get_or_create_token(user=patientuser_instance.user)
-            resp.update({"token":token.key})
+        if not patientuser_instance:
+            return api_error_response(error_data={"error":"Patient User creation failed"})
+        
+        token,_ = get_or_create_token(user=patientuser_instance.user)
 
-        return api_success_response(response_data=resp,status=status.HTTP_201_CREATED)
+        return api_success_response(response_data={"message": "Patient User created successfully","token": token.key},status=status.HTTP_201_CREATED)
     
 
     
