@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Report for Bill #{{ bill.bill_number }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1,h3{
+            color: #333;
+        }
+        p {
+            color: #666;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+        th {
+            background-color: #f0f0f0;
+            text-align: left;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .header-section {
+            padding-bottom: 1rem;
+            border-bottom: 2px solid black;
+
+        }
+        .bill-to-section {
+            margin-bottom: 50px;
+        
+        }
+        .no-border-top {
+            border-top: none;
+        }
+        .no-border-bottom {
+            border-bottom: none;
+            border-left:none ;
+        }
+        .margin-top-20px {
+            margin-top: 20px;
+        }
+        .footer {
+            border-top: 2px solid black;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: white; /* Set background color for the footer */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="header-section">
+    <h1 class="text-center">Report</h1>
+    </div>
+    <div class="bill-to-section">
+        <p class="text-right font-bold"> Date:{{ bill.created_on|date:'d/m/Y'}}</p>
+        <!-- <p class="text-right font-bold">Bill Number: {{ bill.bill_number }}</p> -->
+        <div class="patient-info margin-top-20px">
+            <p>Patinet Name</p>
+            <h3>{{ bill.patientuser.name }}</h3>
+            <p>Gender</p>
+            <h3>{{ bill.patientuser.gender|capfirst }}</h3>
+            <p>Age</p>
+            <h3>{{ patient_age}}</h3>
+            <!-- <p>{{ bill.patientuser.address}},{{ bill.patientuser.city}}</p>
+            <p>{{ bill.patientuser.state}},{{ bill.patientuser.country}}</p>
+            <p>{{ bill.patientuser.pincode}}</p> -->
+        </div>
+    </div>
+    
+    
+    
+    <h3>Tests</h3>
+    <table>
+        <tr>
+            <th>Test Name</th>
+            <th>Value</th>
+            <th>unit</th>
+            <th>Reference Range</th>
+        </tr>
+        {% for item in bill_items %}
+        <tr>
+            <td>{{ item.test.name }}</td>
+            <td>{{ item.value }}</td>
+            <td>{{ item.test.unit }}</td>
+            {% if item.test.reference_range %}
+            <td>{{ item.test.reference_range }}</td>
+            {% else %}
+            <td>-</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+        <!-- <tr class="">
+            <td colspan="3" class="text-right no-border-bottom"><strong>Total</strong></td>
+            <td class=""><strong>{{ bill.total }}</strong></td>
+        </tr> -->
+    </table>
+    
+</body>
+</html>
+

@@ -3,6 +3,7 @@ from django.db import models
 from commons.models import BaseModel
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
+from datetime import datetime
 
 TIME_FOR_EXPIRATION_IN_MINUTES = 30
 
@@ -88,6 +89,14 @@ class PatientUser(BaseModel):
     state = models.CharField(max_length=50,null=True,blank=True)
     pincode = models.CharField(max_length=10,null=True,blank=True)
     country = models.CharField(max_length=50,null=True,blank=True)
+
+    def calculate_age(self):
+        if self.date_of_birth:
+            today = datetime.today()
+            birthdate = self.date_of_birth
+            age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+            return age
+        return None
 
     def __str__(self):
         return self.name

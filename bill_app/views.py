@@ -9,6 +9,9 @@ from commons.db_utils import update_db_object
 from rest_framework import status as http_status
 from commons.permissions import AllowOnlyLabUsers,AllowOnlyPatientUsers
 from bill_app.serializers import BillSerializers,TestSerializers,BillItemSerializers,BillDetailedSerializers
+from django.template import loader
+import pdfkit
+from django.http import HttpResponse
 
 class BillView(BaseView):
     permission_classes = [AllowOnlyLabUsers]
@@ -109,14 +112,19 @@ class TestView(BaseView):
 
     def post(self,request):
         self.validate_field_in_params(request.data,["name","unit"])
+        name = request.data.get("name")
         test_data = {
-            "name": request.data.get("name"),
+            "name": name,
             "unit": request.data.get("unit"),
             "description": request.data.get("description",""),
             "reference_range": request.data.get("reference_range",""),
             "price": request.data.get("price",0.0)
         }
-        create_test(**test_data)
+        try:
+            get_test(name=name)
+            return api_error_response(error_data={"error":"Test with this name already exist"})
+        except ObjectDoesNotExist:
+            create_test(**test_data)
 
         return api_success_response(response_data={"message":"Created Test successfully"})
     
@@ -173,11 +181,73 @@ class GetBillReportForPatientView(BaseView):
     
 
             
-
-
-
-
-
-
-
+class DownloadDocumentView(BaseView):
+    
+    def get(self, request, bill_id,doc_type):
+        try:
+            bill_instance = get_bill(id=bill_id)
+        except ObjectDoesNotExist:
+            return api_error_response(error_data={"error": "Bill does not exist"})
         
+        if bill_instance.status != "completed":
+            return api_error_response(error_data={"error": f"Report is {bill_instance.status}. Can't download !"})
+        
+        patient_age = bill_instance.patientuser.calculate_age()
+
+        bill_items = bill_instance.billitem_set.all()
+
+        DOC_NAME = 'receipt.html' if doc_type == 'RECEIPT' else 'report.html'
+        
+        template = loader.get_template(DOC_NAME)
+        context = {
+            'bill': bill_instance,
+            'bill_items': bill_items,
+            'patient_age': patient_age
+        }
+        html_content = template.render(context)
+        
+        pdf_file = pdfkit.from_string(html_content,False)
+        
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename=f"{DOC_NAME.lower()}.pdf"'
+        
+        return response
+    
+class UpdateBillItems(BaseView):
+    permission_classes = [AllowOnlyLabUsers]
+
+    def patch(self, request, bill_id):
+        self.validate_field_in_params(request.data,["bill_items"])
+        try:
+            bill_instance = get_bill(id=bill_id)
+        except ObjectDoesNotExist:
+            return api_error_response(error_data={"error": "Bill does not exist"})
+        
+        bill_items_data = request.data["bill_items"]
+        
+        for item_data in bill_items_data:
+            try:
+                bill_item = get_billitem(id=item_data['id'], bill=bill_instance)
+                update_db_object(bill_item,{"value":item_data["value"],"status":item_data["status"]})
+            except ObjectDoesNotExist:
+                pass
+
+        bill_instance.update_bill_status_based_on_billitems()
+        return api_success_response(response_data={"message":"Bill Items Updated Successfully"})
+    
+
+class GetBillData(BaseView):
+    
+    def get(self, request, bill_id):
+        try:
+            bill_instance = get_bill(id=bill_id)
+        except ObjectDoesNotExist:
+            return api_error_response(error_data={"error": "Bill does not exist"})
+
+        bill_items = bill_instance.billitem_set.all()
+        
+        data = {
+            'bill': BillSerializers(bill_instance).data,
+            'bill_items': BillItemSerializers(bill_items,many=True).data,
+        }
+        return api_success_response(response_data={**data})

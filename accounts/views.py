@@ -54,7 +54,7 @@ class GetTokenView(BaseView):
 
         token,_ = get_or_create_token(user=user_instance)
 
-        return api_success_response(response_data={"token": token.key})
+        return api_success_response(response_data={"token": token.key,"role":user_instance.role})
     
 
 class LabUserView(BaseView):
